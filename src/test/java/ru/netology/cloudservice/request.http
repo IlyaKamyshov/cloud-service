@@ -1,0 +1,59 @@
+POST http://localhost:8080/login
+Content-Type: application/json
+
+{
+  "login": "admin",
+  "password": "passw0rd"
+}
+
+###
+
+POST http://localhost:8080/login
+Content-Type: application/json
+
+{
+  "login": "user",
+  "password": "password"
+}
+
+###
+
+POST http://localhost:8080/logout
+auth-token: Bearer flpML9nVZj4b8RT6--7JCVJe0NkH_VU0uvgMPKCz7x8
+
+###
+
+POST http://localhost:8080/file?filename=newfile3.docx
+auth-token: Bearer IGx3NwN8f6Kt0r0lzkb93SEjQskDCjRt7inTqTYFPqg
+Content-Type: multipart/form-data; boundary=--------------------------------WebAppBoundary
+
+----------------------------------WebAppBoundary
+Content-Disposition: form-data; name="file"; filename="upload.txt"
+
+< upload-empty-test-file.txt
+----------------------------------WebAppBoundary
+
+###
+
+GET http://localhost:8080/list?limit=32
+auth-token: Bearer Ttc25L6yotVGdBKBEx5n7IMj-vRMhiSj9tgjnTzYi48
+
+###
+
+GET http://localhost:8080/file?filename=upload-test-file.txt
+auth-token: Bearer Ez0BSGtqyKjUipJP5xXymupsU3GpKjcw6Ekc9QoqECc
+
+###
+
+DELETE http://localhost:8080/file?filename=921.xlsx
+auth-token: Bearer JGz7NMpiYBbxvvIwMTY0AlrsJwM1nfBWhBJgqoI5SkM
+
+###
+
+PUT http://localhost:8080/file?filename=test.docx
+auth-token: Bearer pfRup1-3u78VN1paYIirOhr9PXgBdQbtr4WTPXuR0lk
+Content-Type: application/json
+
+{
+  "filename": "test-test.docx"
+}

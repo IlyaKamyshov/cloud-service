@@ -1,0 +1,10 @@
+databaseChangeLog:
+  - include:
+      file: scripts/01-table-users.sql
+      relativeToChangeLogFile: true
+  - include:
+      file: scripts/02-table-files.sql
+      relativeToChangeLogFile: true
+  - include:
+      file: scripts/03-data-users.sql
+      relativeToChangeLogFile: true
