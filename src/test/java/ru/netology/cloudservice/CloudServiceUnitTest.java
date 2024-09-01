@@ -212,7 +212,6 @@ public class CloudServiceUnitTest {
                 .stream()
                 .collect(Collectors.toMap(FileEntity::getFileName, FileEntity::getSize));
 
-        System.out.println(actual);
         verify(fileRepository, times(1)).findAllByLogin(userDetails.getUsername());
         assertEquals(expected, actual);
 
