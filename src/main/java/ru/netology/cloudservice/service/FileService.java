@@ -110,13 +110,12 @@ public class FileService {
 
     }
 
-    public List<FileInfoDTO> getFilesList(String login, int limit) {
+    public List<FileEntity> getFilesList(String login, int limit) {
 
-        List<FileInfoDTO> filesList = fileRepository
+        List<FileEntity> filesList = fileRepository
                 .findAllByLogin(login)
                 .stream()
                 .limit(limit)
-                .map(fileEntity -> new FileInfoDTO(fileEntity.getFileName(), fileEntity.getSize()))
                 .collect(Collectors.toList());
 
         logger.logInfo("Пользователь " + login + " успешно получил список своих файлов");

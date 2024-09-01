@@ -15,6 +15,7 @@ import ru.netology.cloudservice.service.FileService;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/")
@@ -29,7 +30,10 @@ public class FileController {
     @GetMapping("/list")
     @ResponseStatus(HttpStatus.OK)
     public List<FileInfoDTO> getFilesList(@RequestParam int limit) {
-        return fileService.getFilesList(getLogin(), limit);
+        return fileService.getFilesList(getLogin(), limit)
+                .stream()
+                .map(fileEntity -> new FileInfoDTO(fileEntity.getFileName(), fileEntity.getSize()))
+                .collect(Collectors.toList());
     }
 
     @PostMapping("/file")
@@ -40,7 +44,7 @@ public class FileController {
 
     @DeleteMapping("/file")
     @ResponseStatus(HttpStatus.OK)
-    public void deleteFile(@RequestParam("filename")  String fileName) throws IOException {
+    public void deleteFile(@RequestParam("filename") String fileName) throws IOException {
         fileService.deleteFile(getLogin(), fileName);
     }
 

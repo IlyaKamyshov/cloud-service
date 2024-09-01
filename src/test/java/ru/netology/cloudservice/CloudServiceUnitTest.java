@@ -11,7 +11,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
-import ru.netology.cloudservice.dto.FileInfoDTO;
 import ru.netology.cloudservice.dto.FileRenameDTO;
 import ru.netology.cloudservice.entity.FileEntity;
 import ru.netology.cloudservice.exception.InvalidInputDataException;
@@ -22,10 +21,8 @@ import ru.netology.cloudservice.util.CustomFileUtil;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
@@ -206,13 +203,16 @@ public class CloudServiceUnitTest {
 
         when(fileRepository.findAllByLogin(userDetails.getUsername())).thenReturn(fileEntityList);
 
-        List<FileInfoDTO> expected = new ArrayList<>();
-        expected.add(new FileInfoDTO("test-file-1.txt", 8881L));
-        expected.add(new FileInfoDTO("test-file-2.txt", 8882L));
-        expected.add(new FileInfoDTO("test-file-3.txt", 8883L));
+        Map<String, Long> expected = new HashMap<>();
+        expected.put("test-file-1.txt", 8881L);
+        expected.put("test-file-2.txt", 8882L);
+        expected.put("test-file-3.txt", 8883L);
 
-        List<FileInfoDTO> actual = fileService.getFilesList(userDetails.getUsername(), 3);
+        Map<String, Long> actual = fileService.getFilesList(userDetails.getUsername(), 3)
+                .stream()
+                .collect(Collectors.toMap(FileEntity::getFileName, FileEntity::getSize));
 
+        System.out.println(actual);
         verify(fileRepository, times(1)).findAllByLogin(userDetails.getUsername());
         assertEquals(expected, actual);
 
