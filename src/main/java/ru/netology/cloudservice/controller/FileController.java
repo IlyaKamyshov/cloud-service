@@ -38,7 +38,8 @@ public class FileController {
 
     @PostMapping("/file")
     @ResponseStatus(HttpStatus.OK)
-    public void uploadFile(@RequestParam("filename") String fileName, @RequestBody MultipartFile file) {
+    public void uploadFile(@RequestParam("filename") String fileName, @RequestBody MultipartFile file)
+            throws IOException {
         fileService.uploadFile(getLogin(), fileName, file);
     }
 

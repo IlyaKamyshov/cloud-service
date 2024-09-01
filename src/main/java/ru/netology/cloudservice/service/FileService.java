@@ -1,11 +1,10 @@
 package ru.netology.cloudservice.service;
 
-import lombok.SneakyThrows;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import ru.netology.cloudservice.entity.FileEntity;
 import ru.netology.cloudservice.exception.InvalidInputDataException;
-import ru.netology.cloudservice.dto.FileInfoDTO;
 import ru.netology.cloudservice.dto.FileRenameDTO;
 import ru.netology.cloudservice.logger.CloudServiceLogger;
 import ru.netology.cloudservice.repository.FileRepository;
@@ -30,8 +29,8 @@ public class FileService {
         this.logger = logger;
     }
 
-    @SneakyThrows
-    public void uploadFile(String login, String fileName, MultipartFile file) {
+    @Transactional
+    public void uploadFile(String login, String fileName, MultipartFile file) throws IOException {
 
         if (file == null) {
             throw new InvalidInputDataException("Файл отсутствует в запросе");
@@ -60,6 +59,7 @@ public class FileService {
 
     }
 
+    @Transactional
     public void deleteFile(String login, String fileName) throws IOException {
 
         FileEntity fileEntity = getFile(fileName, login);
@@ -94,6 +94,7 @@ public class FileService {
 
     }
 
+    @Transactional
     public void updateFile(String login, String fileName, FileRenameDTO newFileName) {
 
         FileEntity fileEntity = getFile(fileName, login);
