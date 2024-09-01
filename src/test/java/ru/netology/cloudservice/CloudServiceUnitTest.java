@@ -69,10 +69,6 @@ public class CloudServiceUnitTest {
                 .roles("USER")
                 .build();
 
-        when(securityContext.getAuthentication()).thenReturn(authentication);
-        SecurityContextHolder.setContext(securityContext);
-        when(authentication.getPrincipal()).thenReturn(userDetails);
-
         fileEntity = FileEntity.builder()
                 .id(9999L)
                 .fileName("test-file.txt")
@@ -107,7 +103,7 @@ public class CloudServiceUnitTest {
 
         when(fileRepository.findByFileNameAndLogin(any(), any())).thenReturn(null);
 
-        fileService.uploadFile(fileEntity.getFileName(), multipartFile);
+        fileService.uploadFile(userDetails.getUsername(), fileEntity.getFileName(), multipartFile);
 
         verify(fileRepository, times(1)).save(any(FileEntity.class));
         verify(customFileUtil, times(1)).upload(eq(multipartFile.getBytes()), any());
@@ -120,7 +116,7 @@ public class CloudServiceUnitTest {
         when(fileRepository.findByFileNameAndLogin(any(), any())).thenReturn(fileEntity);
 
         Exception exception = Assertions.assertThrows(InvalidInputDataException.class,
-                () -> fileService.uploadFile(fileEntity.getFileName(), multipartFile));
+                () -> fileService.uploadFile(userDetails.getUsername(), fileEntity.getFileName(), multipartFile));
 
         assertEquals("Файл " + fileEntity.getFileName() + " уже загружен в облако", exception.getMessage());
 
@@ -130,7 +126,7 @@ public class CloudServiceUnitTest {
     void uploadFileWhenFileIsNotAttached() {
 
         Exception exception = Assertions.assertThrows(InvalidInputDataException.class,
-                () -> fileService.uploadFile(fileEntity.getFileName(), null));
+                () -> fileService.uploadFile(userDetails.getUsername(), fileEntity.getFileName(), null));
 
         assertEquals("Файл отсутствует в запросе", exception.getMessage());
 
@@ -141,7 +137,7 @@ public class CloudServiceUnitTest {
 
         when(fileRepository.findByFileNameAndLogin(any(), any())).thenReturn(fileEntity);
 
-        fileService.deleteFile(fileEntity.getFileName());
+        fileService.deleteFile(userDetails.getUsername(), fileEntity.getFileName());
 
         verify(fileRepository, times(1)).delete(fileEntity);
         verify(customFileUtil, times(1)).delete(fileEntity.getFileHash());
@@ -154,7 +150,7 @@ public class CloudServiceUnitTest {
         when(fileRepository.findByFileNameAndLogin(any(), any())).thenReturn(null);
 
         Exception exception = Assertions.assertThrows(InvalidInputDataException.class,
-                () -> fileService.deleteFile(fileEntity.getFileName()));
+                () -> fileService.deleteFile(userDetails.getUsername(), fileEntity.getFileName()));
 
         assertEquals("Файл " + fileEntity.getFileName() + " не загружен в облако", exception.getMessage());
 
@@ -166,7 +162,7 @@ public class CloudServiceUnitTest {
         when(fileRepository.findByFileNameAndLogin(any(), any())).thenReturn(fileEntity);
         when(customFileUtil.download(any())).thenReturn(fileContent);
 
-        String actual = Arrays.toString(fileService.downloadFile(fileEntity.getFileName()));
+        String actual = Arrays.toString(fileService.downloadFile(userDetails.getUsername(), fileEntity.getFileName()));
         String expected = Arrays.toString(multipartFile.getBytes());
 
         assertEquals(expected, actual);
@@ -180,7 +176,7 @@ public class CloudServiceUnitTest {
         when(fileRepository.findByFileNameAndLogin(any(), any())).thenReturn(null);
 
         Exception exception = Assertions.assertThrows(InvalidInputDataException.class,
-                () -> fileService.downloadFile(fileEntity.getFileName()));
+                () -> fileService.downloadFile(userDetails.getUsername(), fileEntity.getFileName()));
 
         assertEquals("Файл " + fileEntity.getFileName() + " не загружен в облако", exception.getMessage());
 
@@ -193,7 +189,7 @@ public class CloudServiceUnitTest {
 
         when(fileRepository.findByFileNameAndLogin(any(), any())).thenReturn(fileEntity);
 
-        fileService.updateFile(fileEntity.getFileName(), newName);
+        fileService.updateFile(userDetails.getUsername(), fileEntity.getFileName(), newName);
 
         verify(fileRepository, times(1)).save(fileEntity);
         assertEquals(fileEntity.getFileName(), newName.fileName());
@@ -208,7 +204,7 @@ public class CloudServiceUnitTest {
         when(fileRepository.findByFileNameAndLogin(any(), any())).thenReturn(null);
 
         Exception exception = Assertions.assertThrows(InvalidInputDataException.class,
-                () -> fileService.updateFile(fileEntity.getFileName(), newName));
+                () -> fileService.updateFile(userDetails.getUsername(), fileEntity.getFileName(), newName));
 
         assertEquals("Файл " + fileEntity.getFileName() + " не загружен в облако", exception.getMessage());
 
@@ -224,7 +220,7 @@ public class CloudServiceUnitTest {
         expected.add(new FileInfoDTO("test-file-2.txt", 8882L));
         expected.add(new FileInfoDTO("test-file-3.txt", 8883L));
 
-        List<FileInfoDTO> actual = fileService.getFilesList(3);
+        List<FileInfoDTO> actual = fileService.getFilesList(userDetails.getUsername(), 3);
 
         verify(fileRepository, times(1)).findAllByLogin(userDetails.getUsername());
         assertEquals(expected, actual);

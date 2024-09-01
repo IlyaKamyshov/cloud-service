@@ -1,9 +1,6 @@
 package ru.netology.cloudservice.service;
 
 import lombok.SneakyThrows;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import ru.netology.cloudservice.entity.FileEntity;
@@ -34,9 +31,7 @@ public class FileService {
     }
 
     @SneakyThrows
-    public void uploadFile(String fileName, MultipartFile file) {
-
-        String login = getLogin();
+    public void uploadFile(String login, String fileName, MultipartFile file) {
 
         if (file == null) {
             throw new InvalidInputDataException("Файл отсутствует в запросе");
@@ -65,9 +60,8 @@ public class FileService {
 
     }
 
-    public void deleteFile(String fileName) throws IOException {
+    public void deleteFile(String login, String fileName) throws IOException {
 
-        String login = getLogin();
         FileEntity fileEntity = getFile(fileName, login);
 
         if (fileEntity == null) {
@@ -82,9 +76,8 @@ public class FileService {
 
     }
 
-    public byte[] downloadFile(String fileName) throws IOException {
+    public byte[] downloadFile(String login, String fileName) throws IOException {
 
-        String login = getLogin();
         FileEntity fileEntity = getFile(fileName, login);
 
         if (fileEntity == null) {
@@ -101,9 +94,8 @@ public class FileService {
 
     }
 
-    public void updateFile(String fileName, FileRenameDTO newFileName) {
+    public void updateFile(String login, String fileName, FileRenameDTO newFileName) {
 
-        String login = getLogin();
         FileEntity fileEntity = getFile(fileName, login);
 
         if (fileEntity == null) {
@@ -118,9 +110,7 @@ public class FileService {
 
     }
 
-    public List<FileInfoDTO> getFilesList(int limit) {
-
-        String login = getLogin();
+    public List<FileInfoDTO> getFilesList(String login, int limit) {
 
         List<FileInfoDTO> filesList = fileRepository
                 .findAllByLogin(login)
@@ -133,11 +123,6 @@ public class FileService {
 
         return filesList;
 
-    }
-
-    private String getLogin() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        return ((UserDetails) authentication.getPrincipal()).getUsername();
     }
 
     private FileEntity getFile(String fileName, String login) {
